@@ -1,0 +1,81 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Services\ApiService;
+use Illuminate\Http\Request;
+
+class CartController extends Controller
+{
+    private ApiService $api;
+
+    public function __construct(ApiService $api)
+    {
+        $this->api = $api;
+    }
+
+    /**
+     * Show cart contents
+     * API: POST /api/ventas/cart/ with { user_id }
+     * Response: { items: [{product, quantity, price, subtotal}] }
+     */
+    public function index()
+    {
+        $userId = session('user_id', 1); // Default to 1 for testing
+        
+        $response = $this->api->post('/api/ventas/cart/', ['user_id' => $userId]);
+        
+        $cart = [];
+        $error = null;
+        
+        if ($response['success'] && isset($response['data']['items'])) {
+            $cart = $response['data']['items'];
+        } elseif (!$response['success']) {
+            $error = $response['error'];
+        }
+
+        // Get cart total
+        $totalResponse = $this->api->get("/api/ventas/cart/total/?user_id={$userId}");
+        $total = $totalResponse['success'] ? ($totalResponse['data']['total'] ?? 0) : 0;
+
+        return view('cart.index', compact('cart', 'total', 'error'));
+    }
+
+    /**
+     * Add item to cart
+     * API: POST /api/ventas/cart/add/ with { user_id, product_id, quantity }
+     */
+    public function addItem(Request $request)
+    {
+        $validated = $request->validate([
+            'product_id' => 'required|integer',
+            'quantity' => 'required|integer|min:1',
+        ]);
+
+        $userId = session('user_id', 1);
+        $validated['user_id'] = $userId;
+
+        $response = $this->api->post('/api/ventas/cart/add/', $validated);
+
+        if ($response['success']) {
+            return redirect('/carrito')->with('success', '¡Producto agregado al carrito!');
+        }
+
+        return back()->withErrors(['error' => $response['error']]);
+    }
+
+    /**
+     * Get cart total (AJAX endpoint)
+     * API: GET /api/ventas/cart/total/?user_id={user_id}
+     */
+    public function getTotal()
+    {
+        $userId = session('user_id', 1);
+        $response = $this->api->get("/api/ventas/cart/total/?user_id={$userId}");
+
+        return response()->json([
+            'success' => $response['success'],
+            'total' => $response['data']['total'] ?? 0
+        ]);
+    }
+}
