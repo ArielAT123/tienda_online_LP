@@ -3,6 +3,23 @@
 @section('title', 'Carrito de Compras')
 
 @section('content')
+<style>
+/* Blue & white theme overrides */
+.bg-chocolate-section { background: linear-gradient(90deg,#0ea5e9,#3b82f6); }
+.text-accent { color: #0b69ff !important; }
+.btn-accent { background-color: #0b69ff; color: #ffffff; border-radius: .375rem; display:inline-block; text-decoration:none; }
+.btn-accent:hover { background-color: #064ea3; color:#fff; }
+.icon-box { border-radius: .5rem; border:1px solid #bfdbfe; background:#eff6ff; padding: .75rem; display:inline-flex; align-items:center; justify-content:center; }
+.icon-box svg { color: #2563eb; }
+.icon-box.border-yellow-200, .icon-box.bg-yellow-50 { border-color: #bfdbfe !important; background-color: #eff6ff !important; }
+.bg-white.border { box-shadow: 0 1px 2px rgba(15,23,42,0.05); }
+.cart-item:hover { background: #f0f9ff; }
+.summary { background: linear-gradient(180deg,#ffffff,#f8fbff); border-radius:.5rem; }
+.divider { height:1px; background:#e6eefc; margin: .5rem 0; }
+a:hover.text-chocolate { color:#064ea3 !important; }
+/* Headers */
+.cart .p-6 h2, .cart .p-6 h3, .summary h2 { color:#083776; }
+</style>
 <!-- Header -->
 <section class="bg-chocolate-section py-16">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -11,7 +28,7 @@
     </div>
 </section>
 
-<section class="py-16 px-4 bg-neutral-50">
+<section class="py-16 px-4 bg-neutral-50 cart">
     <div class="max-w-4xl mx-auto">
         @if($error)
         <div class="bg-white border border-neutral-200 p-12 text-center">
@@ -50,7 +67,7 @@
                     
                     <div class="divide-y divide-neutral-100">
                         @foreach($cart as $item)
-                        <div class="p-6 flex items-center gap-6">
+                        <div class="p-6 flex items-center gap-6 cart-item">
                             <!-- Product Image -->
                             <div class="w-20 h-20 bg-neutral-100 flex-shrink-0 flex items-center justify-center">
                                 <svg class="w-8 h-8 text-neutral-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -82,7 +99,7 @@
             
             <!-- Order Summary -->
             <div class="lg:col-span-1">
-                <div class="bg-white border border-neutral-200 p-6 sticky top-24">
+                <div class="bg-white border border-neutral-200 p-6 sticky top-24 summary">
                     <h2 class="text-lg font-bold text-neutral-800 mb-6">Resumen del Pedido</h2>
                     
                     <div class="space-y-4 mb-6">
