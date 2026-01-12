@@ -225,6 +225,7 @@
                 <!-- Desktop Navigation -->
                 <div class="hidden md:flex items-center space-x-8">
                     <a href="{{ route('home') }}" class="nav-corp">Inicio</a>
+                    <a href="{{ route('products.search') }}" class="nav-corp">Buscar</a>
                     <a href="{{ route('products.tags') }}" class="nav-corp">Categorías</a>
                     <a href="{{ route('cart.index') }}" class="nav-corp flex items-center">
                         <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -275,6 +276,7 @@
         <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-neutral-200">
             <div class="px-4 py-4 space-y-3">
                 <a href="{{ route('home') }}" class="block text-neutral-600 hover:text-chocolate font-medium py-2">Inicio</a>
+                <a href="{{ route('products.search') }}"class="block text-neutral-600 hover:text-chocolate font-medium py-2">Buscar</a>
                 <a href="{{ route('products.tags') }}" class="block text-neutral-600 hover:text-chocolate font-medium py-2">Categorías</a>
                 <a href="{{ route('cart.index') }}" class="block text-neutral-600 hover:text-chocolate font-medium py-2">Carrito</a>
                 <div class="divider my-3"></div>
@@ -347,6 +349,7 @@
                     <h3 class="text-white font-bold text-sm uppercase tracking-wider mb-6">Navegación</h3>
                     <ul class="space-y-3">
                         <li><a href="{{ route('home') }}" class="text-neutral-300 hover:text-accent transition-colors">Inicio</a></li>
+                        <li><a href="{{ route('products.search') }}" class="text-neutral-300 hover:text-accent transition-colors">Buscar</a></li>
                         <li><a href="{{ route('products.tags') }}" class="text-neutral-300 hover:text-accent transition-colors">Categorías</a></li>
                         <li><a href="{{ route('cart.index') }}" class="text-neutral-300 hover:text-accent transition-colors">Carrito</a></li>
                     </ul>

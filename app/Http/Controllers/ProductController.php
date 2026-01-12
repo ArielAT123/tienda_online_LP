@@ -103,4 +103,64 @@ class ProductController extends Controller
             ->withInput()
             ->withErrors($response['errors'] ?? ['error' => $response['error']]);
     }
+    public function search(Request $request)
+    {
+        $query = $request->input('q');
+        $selectedTags = $request->input('tags', []);
+
+        $products = [];
+        $error = null;
+
+        if (!empty($selectedTags)) {
+            foreach ($selectedTags as $tag) {
+                $response = $this->api->get("/api/products/by-tag/{$tag}/");
+
+                if ($response['success'] && isset($response['data']['products'])) {
+                    $products = array_merge($products, $response['data']['products']);
+                }
+            }
+
+            // Eliminar duplicados por ID
+            $products = collect($products)
+                ->unique('id')
+                ->values()
+                ->toArray();
+        }
+
+        // Filtro por texto (nombre)
+        if ($query) {
+            $products = array_filter($products, function ($product) use ($query) {
+                return str_contains(
+                    strtolower($product['name_product'] ?? ''),
+                    strtolower($query)
+                );
+            });
+        }
+
+        // Obtener todas las etiquetas para los filtros
+        $tagsResponse = $this->api->get('/api/products/tags/');
+        $tags = $tagsResponse['data']['tags'] ?? [];
+
+        return view('products.search', compact(
+            'products',
+            'tags',
+            'selectedTags',
+            'query',
+            'error'
+        ));
+    }
+    public function show(int $id)
+    {
+        $response = $this->api->get("/api/products/{$id}/");
+
+        if (!$response['success']) {
+            abort(404);
+        }
+
+        $product = $response['data'];
+
+        return view('products.show', compact('product'));
+    }
+
+
 }

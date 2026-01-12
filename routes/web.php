@@ -32,6 +32,14 @@ Route::post('/registro/vendedor', [AuthController::class, 'registerVendor'])->na
 // Products - Tags
 Route::get('/etiquetas', [ProductController::class, 'tags'])->name('products.tags');
 
+// Products - Show
+Route::get('/producto/{id}', [ProductController::class, 'show'])
+    ->name('products.show');
+
+// Products - Search with filters
+Route::get('/productos/buscar', [ProductController::class, 'search'])
+    ->name('products.search');
+    
 // Products - By Tag
 Route::get('/productos/{tag}', [ProductController::class, 'byTag'])->name('products.by-tag');
 
