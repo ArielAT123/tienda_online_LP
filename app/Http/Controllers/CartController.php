@@ -27,16 +27,28 @@ class CartController extends Controller
         
         $cart = [];
         $error = null;
+        $total = 0;
         
-        if ($response['success'] && isset($response['data']['items'])) {
-            $cart = $response['data']['items'];
-        } elseif (!$response['success']) {
+        if ($response['success']) {
+            $cart = $response['data']['items'] ?? $response['data'] ?? [];
+            
+            // Calculate total from items if available
+            if (is_array($cart)) {
+                foreach ($cart as $item) {
+                    $total += (float)($item['subtotal'] ?? ($item['price'] * ($item['quantity'] ?? 1)));
+                }
+            }
+        } else {
             $error = $response['error'];
         }
 
-        // Get cart total
-        $totalResponse = $this->api->get("/api/ventas/cart/total/?user_id={$userId}");
-        $total = $totalResponse['success'] ? ($totalResponse['data']['total'] ?? 0) : 0;
+        // Try to get total from API endpoint as backup
+        if ($total == 0 && !empty($cart)) {
+            $totalResponse = $this->api->get("/api/ventas/cart/total/?user_id={$userId}");
+            if ($totalResponse['success'] && isset($totalResponse['data']['total'])) {
+                $total = (float)$totalResponse['data']['total'];
+            }
+        }
 
         return view('cart.index', compact('cart', 'total', 'error'));
     }

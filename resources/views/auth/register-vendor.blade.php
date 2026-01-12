@@ -51,16 +51,16 @@
                         <div class="grid grid-cols-2 gap-4">
                             <!-- Direction -->
                             <div>
-                                <label for="direction" class="block text-sm font-medium text-neutral-700 mb-2">Dirección</label>
-                                <input type="text" id="direction" name="direction" value="{{ old('direction') }}"
+                                <label for="direction" class="block text-sm font-medium text-neutral-700 mb-2">Dirección *</label>
+                                <input type="text" id="direction" name="direction" value="{{ old('direction') }}" required
                                     class="input-corp w-full px-4 py-3"
                                     placeholder="Av. Principal 123">
                             </div>
                             
                             <!-- Phone -->
                             <div>
-                                <label for="phone_number" class="block text-sm font-medium text-neutral-700 mb-2">Teléfono</label>
-                                <input type="tel" id="phone_number" name="phone_number" value="{{ old('phone_number') }}"
+                                <label for="phone_number" class="block text-sm font-medium text-neutral-700 mb-2">Teléfono *</label>
+                                <input type="tel" id="phone_number" name="phone_number" value="{{ old('phone_number') }}" required
                                     class="input-corp w-full px-4 py-3"
                                     placeholder="0991234567">
                             </div>
@@ -75,10 +75,10 @@
                     <div class="space-y-5">
                         <!-- Store Name -->
                         <div>
-                            <label for="store_name" class="block text-sm font-medium text-neutral-700 mb-2">Nombre de la Tienda *</label>
-                            <input type="text" id="store_name" name="store_name" value="{{ old('store_name') }}" required
+                            <label for="store_name" class="block text-sm font-medium text-neutral-700 mb-2">Nombre de la Tienda (opcional)</label>
+                            <input type="text" id="store_name" name="store_name" value="{{ old('store_name') }}"
                                 class="input-corp w-full px-4 py-3"
-                                placeholder="Tech Store">
+                                placeholder="Dejar vacío para usar tu nombre">
                         </div>
                         
                         <!-- Store Description -->

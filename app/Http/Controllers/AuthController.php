@@ -42,19 +42,26 @@ class AuthController extends Controller
         if ($response['success']) {
             // Store user data in session
             // API returns: { message, user: {id, name, email, is_vendor} }
-            $user = $response['data']['user'] ?? null;
+            $data = $response['data'];
+            $user = $data['user'] ?? null;
             
             if ($user) {
                 session([
-                    'api_token' => 'logged_in', // Mark as logged in (API doesn't return token)
+                    'api_token' => 'logged_in',
                     'user_id' => $user['id'],
                     'user_name' => $user['name'],
                     'user_email' => $user['email'],
                     'is_vendor' => $user['is_vendor'] ?? false,
                 ]);
+                session()->save(); // Force save session
+                
+                return redirect('/')->with('success', '¡Bienvenido de vuelta, ' . $user['name'] . '!');
+            } else {
+                // Login successful but no user data - still mark as logged in
+                session(['api_token' => 'logged_in']);
+                session()->save();
+                return redirect('/')->with('success', $data['message'] ?? '¡Login exitoso!');
             }
-            
-            return redirect('/')->with('success', '¡Bienvenido de vuelta, ' . ($user['name'] ?? 'Usuario') . '!');
         }
 
         return back()
@@ -93,20 +100,23 @@ class AuthController extends Controller
             'name' => 'required|string|max:255',
         ]);
 
+        // Call Django register endpoint
         $response = $this->api->post('/api/auth/register_client/', $validated);
 
         if ($response['success']) {
-            // Store token if returned
-            if (isset($response['data']['token'])) {
-                session(['api_token' => $response['data']['token']]);
-                session(['user_name' => $validated['name']]);
-            }
+            // Auto login after registration
+            session([
+                'api_token' => 'logged_in',
+                'user_name' => $validated['name'],
+            ]);
+            session()->save();
+            
             return redirect('/')->with('success', '¡Registro exitoso! Bienvenido a nuestra tienda.');
         }
 
         return back()
             ->withInput()
-            ->withErrors($response['errors'] ?? ['error' => $response['error']]);
+            ->withErrors($response['errors'] ?? ['error' => $response['error'] ?? 'Error en el registro']);
     }
 
     /**
@@ -119,7 +129,8 @@ class AuthController extends Controller
 
     /**
      * Register a new vendor
-     * API expects: email, password, name, direction, phone_number, store_name, store_description, store_logo
+     * API expects: email, password, name, direction, phone_number (required)
+     * Optional: store_name, store_description, store_logo
      */
     public function registerVendor(Request $request)
     {
@@ -127,26 +138,34 @@ class AuthController extends Controller
             'email' => 'required|email',
             'password' => 'required|string|min:6',
             'name' => 'required|string|max:255',
-            'direction' => 'nullable|string|max:255',
-            'phone_number' => 'nullable|string|max:20',
-            'store_name' => 'required|string|max:255',
+            'direction' => 'required|string|max:255',
+            'phone_number' => 'required|string|max:20',
+            'store_name' => 'nullable|string|max:255',
             'store_description' => 'nullable|string',
-            'store_logo' => 'nullable|url',
+            'store_logo' => 'nullable|string',
         ]);
 
+        // Call Django register endpoint
         $response = $this->api->post('/api/auth/register_vendor/', $validated);
 
         if ($response['success']) {
-            if (isset($response['data']['token'])) {
-                session(['api_token' => $response['data']['token']]);
+            // Auto login after registration
+            $vendorId = $response['data']['vendor_id'] ?? null;
+            session([
+                'api_token' => 'logged_in',
+                'user_name' => $validated['name'],
+                'is_vendor' => true,
+            ]);
+            if ($vendorId) {
+                session(['user_id' => $vendorId]);
             }
-            session(['user_name' => $validated['name']]);
+            session()->save();
             
             return redirect('/')->with('success', '¡Registro de vendedor exitoso!');
         }
 
         return back()
             ->withInput()
-            ->withErrors($response['errors'] ?? ['error' => $response['error']]);
+            ->withErrors($response['errors'] ?? ['error' => $response['error'] ?? 'Error en el registro']);
     }
 }
