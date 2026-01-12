@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\VendorController;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -39,6 +40,10 @@ Route::get('/productos/{tag}', [ProductController::class, 'byTag'])->name('produ
 Route::get('/productos-agregar', [ProductController::class, 'showAddForm'])->name('products.add');
 Route::post('/productos-agregar', [ProductController::class, 'addProduct'])->name('products.add.store');
 
+// Product edit (simulated for vendor)
+Route::get('/productos/{id}/editar', [ProductController::class, 'edit'])->name('products.edit');
+Route::post('/productos/{id}', [ProductController::class, 'update'])->name('products.update');
+
 // Cart
 Route::get('/carrito', [CartController::class, 'index'])->name('cart.index');
 Route::post('/carrito/agregar', [CartController::class, 'addItem'])->name('cart.add');
@@ -46,3 +51,6 @@ Route::get('/carrito/total', [CartController::class, 'getTotal'])->name('cart.to
 
 // Vendors
 Route::get('/vendedor/{id}', [VendorController::class, 'show'])->name('vendors.show');
+
+// User profile (private) - shows client profile or redirects to vendor profile if user is vendor
+Route::get('/perfil', [UserController::class, 'show'])->name('users.show');

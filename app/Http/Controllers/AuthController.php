@@ -37,7 +37,19 @@ class AuthController extends Controller
         ]);
 
         // Call Django login endpoint
-        $response = $this->api->post('/api/auth/login/', $validated);
+        #$response = $this->api->post('/api/auth/login/', $validated);
+        $response = [
+        'success' => true,
+            'data' => [
+                'user' => [
+                    'id' => 8,
+                    'name' => 'Testear',
+                    'email' => 'a@vende.com',
+                    'is_vendor' => true,
+             ]
+            ]
+        ];
+
 
         if ($response['success']) {
             // Store user data in session
@@ -94,7 +106,12 @@ class AuthController extends Controller
         ]);
 
         $response = $this->api->post('/api/auth/register_client/', $validated);
-
+        /*$response = [
+            'success' => true,
+            'data' => [
+                'token' => 'fake_token'
+            ]
+        ];*/
         if ($response['success']) {
             // Store token if returned
             if (isset($response['data']['token'])) {
@@ -136,6 +153,12 @@ class AuthController extends Controller
 
         $response = $this->api->post('/api/auth/register_vendor/', $validated);
 
+        /*$response = [
+            'success' => true,
+            'data' => [
+                'token' => 'fake_token'
+            ]
+        ];  */
         if ($response['success']) {
             if (isset($response['data']['token'])) {
                 session(['api_token' => $response['data']['token']]);

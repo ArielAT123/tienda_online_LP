@@ -41,6 +41,8 @@
                             placeholder="1">
                     </div>
                 </div>
+
+
                 
                 <!-- Product Name -->
                 <div>

@@ -6,7 +6,7 @@
 <style>
 /* Blue & white theme overrides */
 .bg-chocolate-section { background: linear-gradient(90deg,#0ea5e9,#3b82f6); }
-.text-accent { color: #0b69ff !important; }
+.text-accent { color: #ffffff !important; }
 .btn-accent { background-color: #0b69ff; color: #ffffff; border-radius: .375rem; display:inline-block; text-decoration:none; }
 .btn-accent:hover { background-color: #064ea3; color:#fff; }
 .icon-box { border-radius: .5rem; border:1px solid #bfdbfe; background:#eff6ff; padding: .75rem; display:inline-flex; align-items:center; justify-content:center; }
@@ -28,7 +28,7 @@ a:hover.text-chocolate { color:#064ea3 !important; }
     </div>
 </section>
 
-<section class="py-16 px-4 bg-neutral-50 cart">
+<section class="py-16 px-4 bg-gray-100 cart">
     <div class="max-w-4xl mx-auto">
         @if($error)
         <div class="bg-white border border-neutral-200 p-12 text-center">
