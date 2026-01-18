@@ -103,6 +103,10 @@ class ProductController extends Controller
             ->withInput()
             ->withErrors($response['errors'] ?? ['error' => $response['error']]);
     }
+
+    /**
+     * Search products by tags and query
+     */
     public function search(Request $request)
     {
         $query = $request->input('q');
@@ -149,6 +153,10 @@ class ProductController extends Controller
             'error'
         ));
     }
+
+    /**
+     * Show a single product
+     */
     public function show(int $id)
     {
         $response = $this->api->get("/api/products/{$id}/");
@@ -162,5 +170,50 @@ class ProductController extends Controller
         return view('products.show', compact('product'));
     }
 
+    /**
+     * Show edit form for a product (simulated/fallback)
+     */
+    public function edit(string $id)
+    {
+        // Try to fetch product details from API
+        $response = $this->api->withSessionToken()->get("/api/products/{$id}/");
 
+        if ($response['success'] && isset($response['data'])) {
+            $product = $response['data'];
+        } else {
+            // Fallback fake product for demonstration
+            $product = [
+                'id' => $id,
+                'id_product' => 'PROD-FAKE-001',
+                'name_product' => 'Producto de Ejemplo',
+                'description' => 'Este es un producto de ejemplo creado para pruebas.',
+                'price' => '199.99',
+                'stock' => 10,
+                'vendor_id' => session('user_id', 1),
+                'tags' => ['demo', 'sample'],
+            ];
+        }
+
+        return view('products.edit', compact('product'));
+    }
+
+    /**
+     * Update a product (simulated)
+     */
+    public function update(Request $request, string $id)
+    {
+        $validated = $request->validate([
+            'id_product' => 'required|string|max:50',
+            'name_product' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'price' => 'required|numeric|min:0',
+            'stock' => 'required|integer|min:0',
+            'tags' => 'nullable|array',
+            'tags.*' => 'string',
+        ]);
+
+        // For now, simulate success and redirect back
+        // In a real implementation we would call the API: $this->api->withSessionToken()->put("/api/products/{$id}/", $validated);
+        return redirect()->route('products.add')->with('success', 'Producto actualizado (simulado)');
+    }
 }

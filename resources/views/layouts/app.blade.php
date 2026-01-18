@@ -238,21 +238,21 @@
                 <!-- Auth Buttons -->
                 <div class="hidden md:flex items-center space-x-4">
                     @if(session('api_token'))
-                        <span class="text-neutral-600 font-medium flex items-center">
+                        <a href="{{ route('users.show') }}" class="text-neutral-600 font-medium flex items-center hover:underline">
                             <svg class="w-5 h-5 mr-2 text-chocolate" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                             </svg>
                             {{ session('user_name', 'Usuario') }}
-                        </span>
+                        </a>
                         @if(session('is_vendor'))
                         <a href="{{ route('products.add') }}" class="text-accent font-medium hover:text-accent-dark">
                             + Producto
                         </a>
                         @endif
-                        <form action="{{ route('auth.logout') }}" method="POST" class="inline">
+                        <form action="{{ route('auth.logout') }}" method="POST" class="inline ml-4">
                             @csrf
-                            <button type="submit" class="text-neutral-500 hover:text-red-600 font-medium">
-                                Salir
+                            <button type="submit" class="text-neutral-600 hover:text-red-600 font-medium">
+                                Cerrar sesión
                             </button>
                         </form>
                     @else
@@ -281,7 +281,7 @@
                 <a href="{{ route('cart.index') }}" class="block text-neutral-600 hover:text-chocolate font-medium py-2">Carrito</a>
                 <div class="divider my-3"></div>
                 @if(session('api_token'))
-                    <div class="text-neutral-500 py-2">{{ session('user_name', 'Usuario') }}</div>
+                    <a href="{{ route('users.show') }}" class="block text-neutral-500 py-2 hover:underline">{{ session('user_name', 'Usuario') }}</a>
                     @if(session('is_vendor'))
                     <a href="{{ route('products.add') }}" class="block text-accent font-medium py-2">+ Agregar Producto</a>
                     @endif
@@ -306,6 +306,17 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
             </svg>
             <span class="text-green-800">{{ session('success') }}</span>
+        </div>
+    </div>
+    @endif
+
+    @if(session('info'))
+    <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mx-4 mt-4 max-w-7xl lg:mx-auto">
+        <div class="flex items-center">
+            <svg class="w-5 h-5 text-blue-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M12 20a8 8 0 100-16 8 8 0 000 16z"></path>
+            </svg>
+            <span class="text-blue-800">{{ session('info') }}</span>
         </div>
     </div>
     @endif
@@ -359,9 +370,19 @@
                 <div>
                     <h3 class="text-white font-bold text-sm uppercase tracking-wider mb-6">Cuenta</h3>
                     <ul class="space-y-3">
+                        @if(session('api_token'))
+                        <li><a href="{{ route('users.show') }}" class="text-neutral-300 hover:text-accent transition-colors">Mi Perfil</a></li>
+                        <li>
+                            <form method="POST" action="{{ route('auth.logout') }}">
+                                @csrf
+                                <button type="submit" class="text-neutral-300 hover:text-accent transition-colors">Cerrar sesión</button>
+                            </form>
+                        </li>
+                        @else
                         <li><a href="{{ route('auth.login.show') }}" class="text-neutral-300 hover:text-accent transition-colors">Ingresar</a></li>
                         <li><a href="{{ route('auth.register-client') }}" class="text-neutral-300 hover:text-accent transition-colors">Registrarse</a></li>
                         <li><a href="{{ route('auth.register-vendor') }}" class="text-neutral-300 hover:text-accent transition-colors">Ser Vendedor</a></li>
+                        @endif
                     </ul>
                 </div>
             </div>
