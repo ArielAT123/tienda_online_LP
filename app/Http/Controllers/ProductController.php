@@ -115,17 +115,7 @@ class ProductController extends Controller
         if ($response['success'] && isset($response['data'])) {
             $product = $response['data'];
         } else {
-            // Fallback fake product for demonstration
-            $product = [
-                'id' => $id,
-                'id_product' => 'PROD-FAKE-001',
-                'name_product' => 'Producto de Ejemplo',
-                'description' => 'Este es un producto de ejemplo creado para pruebas.',
-                'price' => '199.99',
-                'stock' => 10,
-                'vendor_id' => session('user_id', 1),
-                'tags' => ['demo', 'sample'],
-            ];
+            return back()->withErrors(['error' => 'Producto no encontrado.']);
         }
 
         return view('products.edit', compact('product'));
