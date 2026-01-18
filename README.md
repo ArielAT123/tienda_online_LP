@@ -57,3 +57,129 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+---
+
+# Instrucciones para Probar el Proyecto Tienda Online LP
+
+Este proyecto consta de un frontend desarrollado en Laravel (PHP).
+
+## Requisitos del Sistema
+
+### Frontend (tienda_online_LP)
+- **PHP**: ^8.2
+- **Composer**: ^2.0
+- **Node.js**: ^18.0 (o superior)
+- **npm**: ^9.0
+- **Laravel**: ^12.0
+
+### Herramientas Adicionales
+- **XAMPP** o servidor web con soporte PHP
+- **Git** para control de versiones
+
+## Instalación y Configuración
+
+### Frontend (tienda_online_LP)
+
+1. Clona el repositorio:
+   ```bash
+   git clone <url-del-repositorio>
+   cd tienda_online_LP
+   ```
+
+2. Instala dependencias de PHP:
+   ```bash
+   composer install
+   ```
+
+3. Instala dependencias de JavaScript:
+   ```bash
+   npm install
+   ```
+
+4. Copia el archivo de configuración de entorno:
+   ```bash
+   cp .env.example .env
+   ```
+
+5. Genera la clave de aplicación:
+   ```bash
+   php artisan key:generate
+   ```
+
+6. Ejecuta las migraciones de base de datos:
+   ```bash
+   php artisan migrate
+   ```
+
+7. Construye los assets:
+   ```bash
+   npm run build
+   ```
+
+## Ejecución
+
+### Frontend (tienda_online_LP)
+
+Para desarrollo:
+```bash
+composer run dev
+```
+Esto iniciará el servidor de Laravel, el listener de colas, logs y Vite en modo desarrollo.
+
+Para producción:
+```bash
+php artisan serve
+npm run build
+```
+
+## Aclaración
+
+Es necesario que se ejecute el backend y el frontend en puertos diferentes. 
+Ej: para el backend, utilize 
+```bash
+ python manage.py runserver 8000
+
+ ``` 
+ ```bash  y para el frontend
+ php artisan serve --port=8080
+  ```
+## Pruebas
+
+### Frontend (tienda_online_LP)
+
+Ejecuta las pruebas con PHPUnit:
+```bash
+php artisan test
+```
+
+
+## Librerías y Paquetes Principales
+
+### Frontend (tienda_online_LP)
+
+**PHP/Laravel:**
+- Laravel Framework: ^12.0
+- Laravel Tinker: ^2.10.1
+- FakerPHP: ^1.23
+- Laravel Pail: ^1.2.2
+- Laravel Pint: ^1.24
+- Laravel Sail: ^1.41
+- Mockery: ^1.6
+- Collision: ^8.6
+- PHPUnit: ^11.5.3
+
+**JavaScript/Node.js:**
+- Vite: ^7.0.7
+- TailwindCSS: ^4.0.0
+- Axios: ^1.11.0
+- Concurrently: ^9.0.1
+- Laravel Vite Plugin: ^2.0.0
+- TailwindCSS Vite: ^4.0.0
+
+
+## Notas Adicionales
+
+- Asegúrate de configurar las variables de entorno en `.env` para ambos proyectos.
+- El frontend se conecta al backend a través de APIs.
+- Para desarrollo local, ejecuta ambos servidores simultáneamente.
