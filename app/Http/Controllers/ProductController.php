@@ -73,32 +73,97 @@ class ProductController extends Controller
 
     /**
      * Add a new product
-     * API expects: { id_product, name_product, description, price, stock, vendor_id, tags[] }
+     * API expects: { id_product, name_product, description, price, stock, img, vendor_id, tags[] }
      */
     public function addProduct(Request $request)
     {
+        \Log::info('====== INICIO addProduct ======');
+        \Log::info('Session user_id: ' . session('user_id'));
+        \Log::info('Session api_token: ' . (session('api_token') ? 'EXISTS' : 'NULL'));
+        \Log::info('Request has file: ' . ($request->hasFile('image') ? 'YES' : 'NO'));
+        
         $validated = $request->validate([
             'id_product' => 'required|string|max:50',
             'name_product' => 'required|string|max:255',
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
-            'vendor_id' => 'required|integer',
             'tags' => 'nullable|array',
             'tags.*' => 'string',
+            'image' => 'nullable|image|max:5120', // Max 5MB
         ]);
+
+        \Log::info('Validated data:', $validated);
 
         // Convert tags from string to array if needed
         if (is_string($validated['tags'] ?? null)) {
             $validated['tags'] = explode(',', $validated['tags']);
         }
 
-        $response = $this->api->withSessionToken()->post('/api/products/add/', $validated);
+        // Handle image upload to Cloudinary
+        $imageUrl = null;
+        if ($request->hasFile('image')) {
+            \Log::info('Uploading image to Cloudinary...');
+            \Log::info('File name: ' . $request->file('image')->getClientOriginalName());
+            \Log::info('File size: ' . $request->file('image')->getSize());
+            \Log::info('File mime: ' . $request->file('image')->getMimeType());
+            
+            $uploadResponse = $this->api->uploadFile(
+                'https://backendtecnishop.onrender.com/api/cloudinary/upload/',
+                $request->file('image'),
+                ['folder' => 'products']
+            );
+
+            \Log::info('Cloudinary response:', $uploadResponse);
+
+            if ($uploadResponse['success'] && isset($uploadResponse['data']['urls']['optimized'])) {
+                $imageUrl = $uploadResponse['data']['urls']['optimized'];
+                \Log::info('Image URL obtained: ' . $imageUrl);
+            } elseif ($uploadResponse['success'] && isset($uploadResponse['data']['urls'])) {
+                // Try other URL options
+                \Log::info('URLs available:', $uploadResponse['data']['urls']);
+                $imageUrl = $uploadResponse['data']['urls']['original'] ?? 
+                           $uploadResponse['data']['urls']['auto_crop'] ?? 
+                           $uploadResponse['data']['urls']['thumbnail'] ?? null;
+                \Log::info('Alternative Image URL: ' . $imageUrl);
+            } elseif (!$uploadResponse['success']) {
+                \Log::error('Cloudinary upload failed:', $uploadResponse);
+                return back()
+                    ->withInput()
+                    ->withErrors(['image' => $uploadResponse['error'] ?? 'Error al subir la imagen']);
+            }
+        }
+
+        // Prepare product data - use session user_id as vendor_id
+        $productData = [
+            'id_product' => $validated['id_product'],
+            'name_product' => $validated['name_product'],
+            'description' => $validated['description'] ?? '',
+            'price' => $validated['price'],
+            'stock' => $validated['stock'],
+            'vendor_id' => session('user_id'),
+            'tags' => $validated['tags'] ?? [],
+        ];
+
+        // Add image URL if uploaded
+        if ($imageUrl) {
+            $productData['img'] = $imageUrl;
+        }
+
+        \Log::info('Product data to send:', $productData);
+        \Log::info('Calling API: /api/products/add/');
+
+        $response = $this->api->withSessionToken()->post('/api/products/add/', $productData);
+
+        \Log::info('API Response:', $response);
+        \Log::info('====== FIN addProduct ======');
 
         if ($response['success']) {
             return redirect('/etiquetas')->with('success', '¡Producto agregado exitosamente!');
         }
 
+        \Log::error('Product creation failed. Response:', $response);
+        
         return back()
             ->withInput()
             ->withErrors($response['errors'] ?? ['error' => $response['error']]);

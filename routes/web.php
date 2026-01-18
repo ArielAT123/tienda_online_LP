@@ -56,6 +56,7 @@ Route::post('/productos/{id}', [ProductController::class, 'update'])->name('prod
 Route::get('/carrito', [CartController::class, 'index'])->name('cart.index');
 Route::post('/carrito/agregar', [CartController::class, 'addItem'])->name('cart.add');
 Route::get('/carrito/total', [CartController::class, 'getTotal'])->name('cart.total');
+Route::post('/carrito/checkout', [CartController::class, 'checkout'])->name('cart.checkout');
 
 // Vendors
 Route::get('/vendedor/{id}', [VendorController::class, 'show'])->name('vendors.show');

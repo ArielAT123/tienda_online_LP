@@ -51,9 +51,13 @@
             <div class="bg-white border border-neutral-200 group">
                 <!-- Product Image -->
                 <div class="aspect-square bg-neutral-100 relative overflow-hidden flex items-center justify-center">
-                    <svg class="w-20 h-20 text-neutral-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                    </svg>
+                    @if(!empty($product['img']))
+                        <img src="{{ $product['img'] }}" alt="{{ $product['name_product'] }}" class="w-full h-full object-cover">
+                    @else
+                        <svg class="w-20 h-20 text-neutral-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                    @endif
                     
                     <!-- Status Badge -->
                     <div class="absolute top-4 left-4">
@@ -110,10 +114,14 @@
                         </form>
                     </div>
                     
-                    @if(isset($product['vendor']))
-                    <a href="{{ route('vendors.show', $product['vendor']['id'] ?? 1) }}" class="block mt-4 text-sm text-neutral-400 hover:text-accent transition-colors">
+                    @if(isset($product['vendor']) && isset($product['vendor']['id']))
+                    <a href="{{ route('vendors.show', $product['vendor']['id']) }}" class="block mt-4 text-sm text-neutral-400 hover:text-accent transition-colors">
                         Vendedor: {{ $product['vendor']['name'] ?? 'Ver perfil' }}
                     </a>
+                    @elseif(isset($product['vendor_name']))
+                    <span class="block mt-4 text-sm text-neutral-400">
+                        Vendedor: {{ $product['vendor_name'] }}
+                    </span>
                     @endif
                 </div>
             </div>

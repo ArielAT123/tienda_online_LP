@@ -37,18 +37,7 @@ class AuthController extends Controller
         ]);
 
         // Call Django login endpoint
-        #$response = $this->api->post('/api/auth/login/', $validated);
-        $response = [
-        'success' => true,
-            'data' => [
-                'user' => [
-                    'id' => 8,
-                    'name' => 'Testear',
-                    'email' => 'a@vende.com',
-                    'is_vendor' => true,
-             ]
-            ]
-        ];
+        $response = $this->api->post('/api/auth/login/', $validated);
 
 
         if ($response['success']) {

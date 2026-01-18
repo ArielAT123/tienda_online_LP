@@ -68,6 +68,32 @@ class ApiService
         $response = $this->request()->delete($this->url($endpoint));
         return $this->handleResponse($response);
     }
+
+    /**
+     * Upload a file (multipart/form-data)
+     * @param string $urlOrEndpoint Full URL or relative endpoint
+     */
+    public function uploadFile(string $urlOrEndpoint, $file, array $options = []): array
+    {
+        $http = Http::acceptJson()->timeout(60);
+
+        if ($this->token) {
+            $http = $http->withHeaders([
+                'Authorization' => 'Token ' . $this->token
+            ]);
+        }
+
+        // Use full URL if provided, otherwise use base URL
+        $url = str_starts_with($urlOrEndpoint, 'http') ? $urlOrEndpoint : $this->url($urlOrEndpoint);
+
+        $response = $http->attach(
+            'image',
+            file_get_contents($file->getRealPath()),
+            $file->getClientOriginalName()
+        )->post($url, $options);
+
+        return $this->handleResponse($response);
+    }
     
     
     #Build the full URL

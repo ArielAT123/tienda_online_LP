@@ -21,7 +21,7 @@ class CartController extends Controller
      */
     public function index()
     {
-        $userId = session('user_id', 1); // Default to 1 for testing
+        $userId = session('user_id');
         
         $response = $this->api->post('/api/ventas/cart/', ['user_id' => $userId]);
         
@@ -64,7 +64,7 @@ class CartController extends Controller
             'quantity' => 'required|integer|min:1',
         ]);
 
-        $userId = session('user_id', 1);
+        $userId = session('user_id');
         $validated['user_id'] = $userId;
 
         $response = $this->api->post('/api/ventas/cart/add/', $validated);
@@ -82,12 +82,37 @@ class CartController extends Controller
      */
     public function getTotal()
     {
-        $userId = session('user_id', 1);
+        $userId = session('user_id');
         $response = $this->api->get("/api/ventas/cart/total/?user_id={$userId}");
 
         return response()->json([
             'success' => $response['success'],
             'total' => $response['data']['total'] ?? 0
         ]);
+    }
+
+    /**
+     * Process checkout
+     * API: POST /api/ventas/checkout/ with { user_id }
+     */
+    public function checkout()
+    {
+        $userId = session('user_id');
+        
+        if (!$userId) {
+            return redirect()->route('auth.login.show')->with('info', 'Debes iniciar sesión para completar tu compra');
+        }
+
+        $response = $this->api->post('/api/ventas/checkout/', ['user_id' => $userId]);
+
+        if ($response['success']) {
+            $order = $response['data']['order'] ?? $response['data'];
+            return view('cart.confirmation', [
+                'order' => $order,
+                'message' => $response['data']['message'] ?? 'Compra realizada exitosamente'
+            ]);
+        }
+
+        return redirect('/carrito')->withErrors(['error' => $response['error'] ?? 'Error al procesar el pago']);
     }
 }

@@ -21,28 +21,41 @@
     <div class="max-w-2xl mx-auto">
         <div class="bg-white border border-neutral-200 p-8">
             <!-- Form -->
-            <form method="POST" action="{{ route('products.add.store') }}" class="space-y-6">
+            <form method="POST" action="{{ route('products.add.store') }}" class="space-y-6" enctype="multipart/form-data">
                 @csrf
                 
-                <div class="grid grid-cols-2 gap-6">
-                    <!-- Product ID -->
-                    <div>
-                        <label for="id_product" class="block text-sm font-medium text-neutral-700 mb-2">Código del Producto *</label>
-                        <input type="text" id="id_product" name="id_product" value="{{ old('id_product') }}" required
-                            class="input-corp w-full px-4 py-3"
-                            placeholder="PROD-001">
-                    </div>
-                    
-                    <!-- Vendor ID -->
-                    <div>
-                        <label for="vendor_id" class="block text-sm font-medium text-neutral-700 mb-2">ID del Vendedor *</label>
-                        <input type="number" id="vendor_id" name="vendor_id" value="{{ old('vendor_id', session('user_id', 1)) }}" required
-                            class="input-corp w-full px-4 py-3"
-                            placeholder="1">
-                    </div>
+                <!-- Product ID -->
+                <div>
+                    <label for="id_product" class="block text-sm font-medium text-neutral-700 mb-2">Código del Producto *</label>
+                    <input type="text" id="id_product" name="id_product" value="{{ old('id_product') }}" required
+                        class="input-corp w-full px-4 py-3"
+                        placeholder="PROD-001">
                 </div>
 
 
+                <!-- Image Upload -->
+                <div>
+                    <label class="block text-sm font-medium text-neutral-700 mb-2">Imagen del Producto</label>
+                    <div id="image-upload-area" class="border-2 border-dashed border-neutral-300 rounded-lg p-6 text-center cursor-pointer hover:border-chocolate transition-colors">
+                        <input type="file" id="image" name="image" accept="image/*" class="hidden">
+                        <div id="image-placeholder">
+                            <svg class="mx-auto h-12 w-12 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                            <p class="mt-2 text-sm text-neutral-600">Haz clic o arrastra una imagen aquí</p>
+                            <p class="mt-1 text-xs text-neutral-400">PNG, JPG, WEBP (máx. 5MB)</p>
+                        </div>
+                        <div id="image-preview" class="hidden">
+                            <img id="preview-img" src="" alt="Preview" class="mx-auto max-h-48 rounded-lg">
+                            <button type="button" id="remove-image" class="mt-2 text-sm text-red-600 hover:text-red-800">
+                                Eliminar imagen
+                            </button>
+                        </div>
+                    </div>
+                    @error('image')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
                 
                 <!-- Product Name -->
                 <div>
@@ -115,3 +128,71 @@
     </div>
 </section>
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const uploadArea = document.getElementById('image-upload-area');
+    const fileInput = document.getElementById('image');
+    const placeholder = document.getElementById('image-placeholder');
+    const preview = document.getElementById('image-preview');
+    const previewImg = document.getElementById('preview-img');
+    const removeBtn = document.getElementById('remove-image');
+
+    // Click to select file
+    uploadArea.addEventListener('click', function(e) {
+        if (e.target !== removeBtn) {
+            fileInput.click();
+        }
+    });
+
+    // Handle file selection
+    fileInput.addEventListener('change', function() {
+        handleFile(this.files[0]);
+    });
+
+    // Drag and drop
+    uploadArea.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        this.classList.add('border-chocolate', 'bg-chocolate/5');
+    });
+
+    uploadArea.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        this.classList.remove('border-chocolate', 'bg-chocolate/5');
+    });
+
+    uploadArea.addEventListener('drop', function(e) {
+        e.preventDefault();
+        this.classList.remove('border-chocolate', 'bg-chocolate/5');
+        
+        const files = e.dataTransfer.files;
+        if (files.length > 0 && files[0].type.startsWith('image/')) {
+            fileInput.files = files;
+            handleFile(files[0]);
+        }
+    });
+
+    // Remove image
+    removeBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        fileInput.value = '';
+        placeholder.classList.remove('hidden');
+        preview.classList.add('hidden');
+        previewImg.src = '';
+    });
+
+    function handleFile(file) {
+        if (!file || !file.type.startsWith('image/')) return;
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            previewImg.src = e.target.result;
+            placeholder.classList.add('hidden');
+            preview.classList.remove('hidden');
+        };
+        reader.readAsDataURL(file);
+    }
+});
+</script>
+@endpush
