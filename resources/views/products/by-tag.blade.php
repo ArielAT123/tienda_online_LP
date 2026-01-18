@@ -80,9 +80,7 @@
                 <!-- Product Info -->
                 <div class="p-6">
                     <p class="text-neutral-400 text-xs uppercase tracking-wider mb-1">{{ $product['id_product'] ?? '' }}</p>
-                    <h3 class="text-neutral-800 font-bold text-lg mb-2 line-clamp-2 group-hover:text-accent transition-colors">
-                        {{ $product['name_product'] ?? $product['nombre'] ?? 'Producto' }}
-                    </h3>
+                    <a href="{{ route('products.show', $product['id']) }}"><h3 class="text-neutral-800 font-bold text-lg hover:text-accent">{{ $product['name_product'] }}</h3></a>
                     
                     @if(isset($product['description']) && $product['description'])
                     <p class="text-neutral-500 text-sm mb-4 line-clamp-2 leading-relaxed">{{ $product['description'] }}</p>
