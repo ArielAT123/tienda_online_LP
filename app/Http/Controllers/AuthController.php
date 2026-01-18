@@ -103,14 +103,33 @@ class AuthController extends Controller
 
         // Call Django register endpoint
         $response = $this->api->post('/api/auth/register_client/', $validated);
-        /*$response = [
-            'success' => true,
-            'data' => [
-                'token' => 'fake_token'
-            ]
-        ];*/
+        
         if ($response['success']) {
-            // Auto login after registration
+            // Auto login after registration to get user data
+            $loginResponse = $this->api->post('/api/auth/login/', [
+                'email' => $validated['email'],
+                'password' => $validated['password']
+            ]);
+            
+            if ($loginResponse['success']) {
+                $data = $loginResponse['data'];
+                $user = $data['user'] ?? null;
+                
+                if ($user) {
+                    session([
+                        'api_token' => 'logged_in',
+                        'user_id' => $user['id'],
+                        'user_name' => $user['name'],
+                        'user_email' => $user['email'],
+                        'is_vendor' => $user['is_vendor'] ?? false,
+                    ]);
+                    session()->save();
+                    
+                    return redirect('/')->with('success', '¡Registro exitoso! Bienvenido a nuestra tienda.');
+                }
+            }
+            
+            // Fallback if login fails
             session([
                 'api_token' => 'logged_in',
                 'user_name' => $validated['name'],
@@ -154,23 +173,37 @@ class AuthController extends Controller
         // Call Django register endpoint
         $response = $this->api->post('/api/auth/register_vendor/', $validated);
 
-        /*$response = [
-            'success' => true,
-            'data' => [
-                'token' => 'fake_token'
-            ]
-        ];  */
         if ($response['success']) {
-            // Auto login after registration
-            $vendorId = $response['data']['vendor_id'] ?? null;
+            // Auto login after registration to get user data
+            $loginResponse = $this->api->post('/api/auth/login/', [
+                'email' => $validated['email'],
+                'password' => $validated['password']
+            ]);
+            
+            if ($loginResponse['success']) {
+                $data = $loginResponse['data'];
+                $user = $data['user'] ?? null;
+                
+                if ($user) {
+                    session([
+                        'api_token' => 'logged_in',
+                        'user_id' => $user['id'],
+                        'user_name' => $user['name'],
+                        'user_email' => $user['email'],
+                        'is_vendor' => $user['is_vendor'] ?? true,
+                    ]);
+                    session()->save();
+                    
+                    return redirect('/')->with('success', '¡Registro de vendedor exitoso!');
+                }
+            }
+            
+            // Fallback if login fails
             session([
                 'api_token' => 'logged_in',
                 'user_name' => $validated['name'],
                 'is_vendor' => true,
             ]);
-            if ($vendorId) {
-                session(['user_id' => $vendorId]);
-            }
             session()->save();
             
             return redirect('/')->with('success', '¡Registro de vendedor exitoso!');

@@ -41,6 +41,7 @@ class ProductController extends Controller
      */
     public function byTag(string $tag)
     {
+        $tag = strtolower($tag); // Normalize to lowercase for API consistency
         $response = $this->api->get("/api/products/by-tag/{$tag}/");
         
         $products = [];
@@ -194,6 +195,14 @@ class ProductController extends Controller
                 ->unique('id')
                 ->values()
                 ->toArray();
+        } elseif (empty($query) && empty($selectedTags)) {
+            // Si no hay filtros, mostrar todos los productos
+            $response = $this->api->get('/api/products/');
+            if ($response['success'] && isset($response['data'])) {
+                $products = is_array($response['data']) ? $response['data'] : ($response['data']['products'] ?? []);
+            } else {
+                $error = $response['error'] ?? 'Error al cargar productos';
+            }
         }
 
         // Filtro por texto (nombre)
