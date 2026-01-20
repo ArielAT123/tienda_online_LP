@@ -74,8 +74,6 @@
                     <div class="bg-white border border-neutral-200 p-6 sticky top-24">
                         <h3 class="text-sm font-bold text-neutral-800 uppercase tracking-wider mb-6">Opciones</h3>
                         <div class="space-y-4">
-                            <a href="#" class="block w-full text-center py-2 border rounded-md text-sm hover:bg-neutral-50">Editar Perfil</a>
-
                             @unless(session('is_vendor'))
                             <a href="{{ route('auth.register-vendor') }}" class="inline-block px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-semibold shadow-sm text-center mx-auto mt-2">Ser vendedor</a>
                             @endunless
